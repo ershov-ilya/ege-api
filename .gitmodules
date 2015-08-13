@@ -1,0 +1,12 @@
+[submodule "core/class/database"]
+	path = core/class/database
+	url = git@github.com:ershov-ilya/database-class.git
+[submodule "core/class/format"]
+	path = core/class/format
+	url = git@github.com:ershov-ilya/format.class.php.git
+[submodule "core/class/restful"]
+	path = core/class/restful
+	url = git@github.com:ershov-ilya/restful.class.php.git
+[submodule "assets/js/form-autofill"]
+	path = assets/js/form-autofill
+	url = git@github.com:ershov-ilya/form-autofill.git

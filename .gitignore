@@ -1,0 +1,6 @@
+.idea/
+.git/
+cgi-bin/
+.htaccess
+*.private.config.php
+*/private
