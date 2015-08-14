@@ -59,11 +59,13 @@ try {
     $stored_codes=$state['code_sent'];
 
     if(in_array($ask_code,explode(',',$stored_codes))){
+        // Полученный код найден в списке отправленных
         $state['status']='checked';
         $state['code_sent']='';
         $response['message']='Done';
         $response['code']=200;
     }else{
+        // Полученный код не совпал
         $state['attempts']=$state['attempts']+1;
         $response['message']='Wrong code';
         $response['code']=403;
