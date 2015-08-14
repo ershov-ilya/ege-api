@@ -36,19 +36,22 @@ $response=array(
 $rest = new RESTful('send_code',array('phone','code'));
 
 try {
-    print_r($rest->data);
+//    print_r($rest->data);
     $user_id=$modx->user->id;
     $ask_code=$rest->data['code'];
 
     // Подключение к БД
     $db = new Database($pdoconfig);
     $state=$db->getOneWhere('modx_sms_validator', "phone='".$rest->data['phone']."'", 'id,code_sent,phone,attempts,status,time');
-    print_r($state);
+//    print_r($state);
     // Блокировка обращений
     if($state['status']=='blocked'){
         $time=strtotime($state['time'])+360;
         $wait=$time-time();
-        if($wait>0) throw new Exception('Phone number blocked until '.date('H:i:s, M d',$time).' wait:'.$wait.'s' , 423);
+        $blocked_until=date('H:i:s, M d',$time);
+        $response['blocked_until']=$blocked_until;
+        $response['wait']=$wait;
+        if($wait>0) throw new Exception('Phone number blocked until '.$blocked_until.' wait:'.$wait.'s' , 423);
         $state['status']='sent';
         $state['attempts']=0;
     }
