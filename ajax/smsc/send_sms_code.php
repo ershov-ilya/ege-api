@@ -40,7 +40,9 @@ try {
     $sms_code = rand(1000, 9999);
 
 // Формируем сообщение
-    $sms = array();
+    $sms = array(
+        'sender'    =>  'SYNERGY'
+    );
     $sms['mes'] = $site_name.': Ваш проверочный код: ' . $sms_code;
     if (isset($rest->data['phone'])) $sms['phones'] = preg_replace('/[ \-_\(\)]/i', '', $rest->data['phone']);
     else throw new Exception('No phone field value', 400);
