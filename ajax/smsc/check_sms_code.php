@@ -39,10 +39,11 @@ try {
 //    print_r($rest->data);
     $user_id=$modx->user->id;
     $ask_code=$rest->data['code'];
+    $phone = preg_replace('/[ \-_\(\)]/i', '', $rest->data['phone']);
 
     // Подключение к БД
     $db = new Database($pdoconfig);
-    $state=$db->getOneWhere('modx_sms_validator', "phone='".$rest->data['phone']."'", 'id,code_sent,phone,attempts,status,time');
+    $state=$db->getOneWhere('modx_sms_validator', "phone='".$phone."'", 'id,code_sent,phone,attempts,status,time');
 //    print_r($state);
     // Блокировка обращений
     if($state['status']=='checked') throw new Exception('checked' , 200);
