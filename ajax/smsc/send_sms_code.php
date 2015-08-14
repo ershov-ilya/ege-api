@@ -47,7 +47,7 @@ try {
     if (isset($rest->data['phone'])) $sms['phones'] = preg_replace('/[ \-_\(\)]/i', '', $rest->data['phone']);
     else throw new Exception('No phone field value', 400);
 
-    print_r($sms);
+//    print_r($sms);
 
 // Подключение к БД
     $db = new Database($pdoconfig);
@@ -66,20 +66,27 @@ try {
     }else{
         // Номер не зарегистрирован, новая строка в БД
         $state=array(
-            'phone' => $packet['phones'],
+            'phone' => $sms['phones'],
             'code_sent' => $sms_code
         );
         $state['user_id']=$modx->user->id;
         $state['id']=$db->putOne('modx_sms_validator',$state);
     }
-    print_r($state);
+//    print_r($state);
 
 // Отправляем смс
-    $res=send_sms($sms, $smsc_config);
-    print_r($res);
+    $response=send_sms($sms, $smsc_config);
+    $state['response']=$response['raw'];
+    if(isset($response['response']['id'])){
+        $state['request_id']=$response['response']['id'];
+        $state['status']='sent';
+    }else{
+        $state['status']='error';
+    }
+//    print_r($res);
 
 // Сохраняем состояние в БД
-//    $res=$db->updateOne('modx_sms_validator', $state['id'], $state);
+    $res=$db->updateOne('modx_sms_validator', $state['id'], $state);
 }
 catch(Exception $e) {
     // При ошибке
@@ -91,24 +98,3 @@ catch(Exception $e) {
 require_once(API_CORE_PATH . '/class/format/format.class.php');
 if(DEBUG) print Format::parse($response, 'plain');
 else  print Format::parse($response, 'json');
-// Формируем запись
-
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Конец скрипта
-exit(0);
-
-$data=$rest->data;
-
-
-
-print_r($rest->data);
-print_r($rest->scope);
-
-$data=array(
-    'mes' => 'API test',
-    'phone' => '+79257123457'
-);
-print_r($data);
-exit(0);
-
-$res=send_sms($data, $smsc_config);
-var_dump($res);
