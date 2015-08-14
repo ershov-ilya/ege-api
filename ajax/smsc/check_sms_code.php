@@ -45,13 +45,16 @@ try {
     $state=$db->getOneWhere('modx_sms_validator', "phone='".$rest->data['phone']."'", 'id,code_sent,phone,attempts,status,time');
 //    print_r($state);
     // Блокировка обращений
+    if($state['status']=='checked') throw new Exception('checked' , 200);
     if($state['status']=='blocked'){
         $time=strtotime($state['time'])+360;
         $wait=$time-time();
         $blocked_until=date('H:i:s, M d',$time);
-        $response['blocked_until']=$blocked_until;
-        $response['wait']=$wait;
-        if($wait>0) throw new Exception('Phone number blocked until '.$blocked_until.' wait:'.$wait.'s' , 423);
+        if($wait>0){
+            $response['blocked_until']=$blocked_until;
+            $response['wait']=$wait;
+            throw new Exception('Phone number blocked until '.$blocked_until.' wait:'.$wait.'s' , 423);
+        }
         $state['status']='sent';
         $state['attempts']=0;
     }
@@ -62,7 +65,7 @@ try {
         // Полученный код найден в списке отправленных
         $state['status']='checked';
         $state['code_sent']='';
-        $response['message']='Done';
+        $response['message']='checked';
         $response['code']=200;
     }else{
         // Полученный код не совпал
