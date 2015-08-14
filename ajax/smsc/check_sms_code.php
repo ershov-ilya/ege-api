@@ -42,7 +42,16 @@ try {
 
     // Подключение к БД
     $db = new Database($pdoconfig);
-    $state=$db->getOneWhere('modx_sms_validator', "status='sent' AND user_id='$user_id' AND phone='".$rest->data['phone']."'", 'id,code_sent,phone,attempts');
+    $state=$db->getOneWhere('modx_sms_validator', "phone='".$rest->data['phone']."'", 'id,code_sent,phone,attempts,status,time');
+    print_r($state);
+    // Блокировка обращений
+    if($state['status']=='blocked'){
+        $time=strtotime($state['time'])+360;
+        $wait=$time-time();
+        if($wait>0) throw new Exception('Phone number blocked until '.date('H:i:s, M d',$time).' wait:'.$wait.'s' , 423);
+        $state['status']='sent';
+        $state['attempts']=0;
+    }
     if(empty($state)) throw new Exception('No such phone entry', 404);
     $stored_codes=$state['code_sent'];
 
@@ -60,6 +69,7 @@ try {
     if($state['attempts']>10) $state['status']='blocked';
 
 // Сохраняем состояние в БД
+    $state['time']=date('Y-m-d H:i:s');
     $res=$db->updateOne('modx_sms_validator', $state['id'], $state);
 }
 catch(Exception $e) {
