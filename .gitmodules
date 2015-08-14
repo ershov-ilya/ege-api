@@ -10,6 +10,3 @@
 [submodule "core/class/payments/robokassa"]
 	path = core/class/payments/robokassa
 	url = git@github.com:ershov-ilya/robokassa-class.git
-[submodule "assets/js/form-autofill"]
-	path = assets/js/form-autofill
-	url = git@github.com:ershov-ilya/form-autofill.git
