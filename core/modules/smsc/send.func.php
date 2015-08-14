@@ -22,9 +22,14 @@ function send_sms($data, $smsc){
         'mes'       =>  ''
     );
     $data=array_merge($defdata, $data, $smsc);
-	
-	print_r($data);
-	exit(0);
+
+    // Приведение к cp1251
+    $message=$data['mes'];
+    $message=mb_convert_encoding($message, 'CP1251', mb_detect_encoding($message));
+    $data['mes']=$message;
+
+//	print_r($data);
+//	exit(0);
 
     $curl=curl_init(); #Сохраняем дескриптор сеанса cURL
     #Устанавливаем необходимые опции для сеанса cURL
