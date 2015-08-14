@@ -13,6 +13,7 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 defined('DEBUG') or define('DEBUG', false);
 define('MAX_STORE_CODES',5);
+define('MAX_CHECK_ATTEMPTS',10);
 
 header('Content-Type: text/plain; charset=utf-8');
 require_once('../../core/config/core.private.config.php');
@@ -75,7 +76,7 @@ try {
         $response['code']=403;
         $response['attempts']=$state['attempts'];
     }
-    if($state['attempts']>10) $state['status']='blocked';
+    if($state['attempts']>=MAX_CHECK_ATTEMPTS) $state['status']='blocked';
 
 // Сохраняем состояние в БД
     $state['time']=date('Y-m-d H:i:s');
