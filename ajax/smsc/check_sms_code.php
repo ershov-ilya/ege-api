@@ -36,60 +36,28 @@ $response=array(
 $rest = new RESTful('send_code',array('phone','code'));
 
 try {
-    $data=$rest->data;
+    print_r($rest->data);
+    $user_id=$modx->user->id;
+    $ask_code=$rest->data['code'];
 
     // Подключение к БД
     $db = new Database($pdoconfig);
+    $state=$db->getOneWhere('modx_sms_validator', "status='sent' AND user_id='$user_id' AND phone='".$rest->data['phone']."'", 'id,code_sent,phone,attempts');
+    if(empty($state)) throw new Exception('No such phone entry', 404);
+    $stored_codes=$state['code_sent'];
 
-
-    throw new Exception('Script stop', 200);
-
-// Генерируем проверочный код
-    $sms_code = rand(1000, 9999);
-
-// Формируем сообщение
-    $sms = array(
-        'sender'    =>  'SYNERGY'
-    );
-    $sms['mes'] = $site_name.': Ваш проверочный код: ' . $sms_code;
-    if (isset($rest->data['phone'])) $sms['phones'] = preg_replace('/[ \-_\(\)]/i', '', $rest->data['phone']);
-    else throw new Exception('No phone field value', 400);
-
-//    print_r($sms);
-
-
-// Ищем телефон
-    $found = $db->getOne('modx_sms_validator', $sms['phones'],'phone', 'id,user_id,status,phone,code_sent');
-    if(!empty($found))
-    {
-        // Повторный запрос, модифицируем строку в БД
-        $state=$found;
-        $state['code_sent'] = $state['code_sent'].','.$sms_code;
-        $check_arr=explode(',',$state['code_sent']);
-        if(count($check_arr)>MAX_STORE_CODES) {unset($check_arr[0]); $state['code_sent']=implode(',',$check_arr);}
-        $state['status']='ready';
-        $db->updateOne('modx_sms_validator',$found['id'],$state);
+    if(in_array($ask_code,explode(',',$stored_codes))){
+        $state['status']='checked';
+        $state['code_sent']='';
+        $response['message']='Done';
+        $response['code']=200;
     }else{
-        // Номер не зарегистрирован, новая строка в БД
-        $state=array(
-            'phone' => $sms['phones'],
-            'code_sent' => $sms_code
-        );
-        $state['user_id']=$modx->user->id;
-        $state['id']=$db->putOne('modx_sms_validator',$state);
+        $state['attempts']=$state['attempts']+1;
+        $response['message']='Wrong code';
+        $response['code']=403;
+        $response['attempts']=$state['attempts'];
     }
-//    print_r($state);
-
-// Отправляем смс
-    $response=send_sms($sms, $smsc_config);
-    $state['response']=$response['raw'];
-    if(isset($response['response']['id'])){
-        $state['request_id']=$response['response']['id'];
-        $state['status']='sent';
-    }else{
-        $state['status']='error';
-    }
-//    print_r($res);
+    if($state['attempts']>10) $state['status']='blocked';
 
 // Сохраняем состояние в БД
     $res=$db->updateOne('modx_sms_validator', $state['id'], $state);
