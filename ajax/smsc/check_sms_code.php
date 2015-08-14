@@ -29,13 +29,21 @@ require_once(API_CORE_PATH.'/config/pdo.private.config.php');
 require_once(API_CORE_PATH.'/modules/smsc/send.func.php');
 require_once(API_CORE_PATH.'/config/smsc.private.config.php');
 
-$rest = new RESTful('send_code',array('phone'));
 $response=array(
     'message' => 'Not modified',
     'code' => 304
 );
+$rest = new RESTful('send_code',array('phone','code'));
 
 try {
+    $data=$rest->data;
+
+    // Подключение к БД
+    $db = new Database($pdoconfig);
+
+
+    throw new Exception('Script stop', 200);
+
 // Генерируем проверочный код
     $sms_code = rand(1000, 9999);
 
@@ -49,8 +57,6 @@ try {
 
 //    print_r($sms);
 
-// Подключение к БД
-    $db = new Database($pdoconfig);
 
 // Ищем телефон
     $found = $db->getOne('modx_sms_validator', $sms['phones'],'phone', 'id,user_id,status,phone,code_sent');

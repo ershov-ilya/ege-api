@@ -1,0 +1,4 @@
+08.14.2015 9:33:00 MSK  Exception: SQLSTATE[28000] [1045] Access denied for user 'devegemetr_admin2'@'localhost' (using password: YES)
+08.14.2015 9:37:02 MSK  Exception: SQLSTATE[28000] [1045] Access denied for user 'devegemetr_admin2'@'localhost' (using password: YES)
+08.14.2015 9:37:30 MSK  Exception: SQLSTATE[28000] [1045] Access denied for user 'devegemetr_admin2'@'localhost' (using password: YES)
+08.14.2015 9:41:46 MSK  Exception: SQLSTATE[28000] [1045] Access denied for user 'devegemetr_admin2'@'localhost' (using password: YES)
