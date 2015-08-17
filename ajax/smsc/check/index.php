@@ -40,6 +40,7 @@ try {
 //    print_r($rest->data);
     $user_id=$modx->user->id;
     $ask_code=$rest->data['code'];
+    if(empty($rest->data['phone']))  throw new Exception('No phone field value' , 400);
     $phone = preg_replace('/[ \-_\(\)]/i', '', $rest->data['phone']);
 
     // Подключение к БД
