@@ -16,10 +16,10 @@ define('MAX_STORE_CODES',5);
 define('MAX_CHECK_ATTEMPTS',10);
 
 header('Content-Type: text/plain; charset=utf-8');
-require_once('../../core/config/core.private.config.php');
+require_once('../../../core/config/core.private.config.php');
 
 define('MODX_API_MODE',true);
-require_once('../../../index.php');
+require_once('../../../../index.php');
 /* @var modX $modx */
 $site_name=$modx->getOption('site_name');
 
@@ -47,8 +47,11 @@ try {
     $db = new Database($pdoconfig);
     $state=$db->getOneWhere('modx_sms_validator', "phone='".$phone."'", 'id,code_sent,phone,attempts,status,time');
 //    print_r($state);
+//    exit(0);
     // Блокировка обращений
-    if($state['status']=='checked') throw new Exception('checked' , 200);
+    if($state['status']=='checked') {
+        throw new Exception('checked' , 200);
+    }
     if($state['status']=='blocked'){
         $time=strtotime($state['time'])+360;
         $wait=$time-time();

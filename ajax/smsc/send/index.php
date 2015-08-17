@@ -15,10 +15,10 @@ defined('DEBUG') or define('DEBUG', false);
 define('MAX_STORE_CODES',5);
 
 header('Content-Type: text/plain; charset=utf-8');
-require_once('../../core/config/core.private.config.php');
+require_once('../../../core/config/core.private.config.php');
 
 define('MODX_API_MODE',true);
-require_once('../../../index.php');
+require_once('../../../../index.php');
 /* @var modX $modx */
 $site_name=$modx->getOption('site_name');
 
@@ -56,6 +56,7 @@ try {
     $found = $db->getOne('modx_sms_validator', $sms['phones'],'phone', 'id,user_id,status,phone,code_sent');
     if(!empty($found))
     {
+        if($state['status']=='checked') throw new Exception('checked', 200);
         // Повторный запрос, модифицируем строку в БД
         $state=$found;
         $state['code_sent'] = $state['code_sent'].','.$sms_code;
